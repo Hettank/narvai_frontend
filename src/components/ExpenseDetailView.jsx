@@ -168,6 +168,13 @@ const ExpenseDetailView = () => {
     } else {
       setExpenseFromAbove([...expenseFromAbove, newItem]);
       // Similar focus logic for fromAbove
+
+      setTimeout(() => {
+        // Find the new price input and focus it
+        const inputs = document.querySelectorAll('[data-type="fromBelow"] input[type="text"]');
+        const lastInput = inputs[inputs.length - 2]; // The price input of the last row
+        if (lastInput) lastInput.focus();
+      }, 0);
     }
   };
 
