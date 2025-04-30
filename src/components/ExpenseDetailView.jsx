@@ -153,28 +153,29 @@ const ExpenseDetailView = () => {
     return sanitized;
   };
 
-  // Handle adding new expense row
+  // Handle adding new expense row and focus on price input
   const handleAddExpense = type => {
     const newItem = { id: Date.now() + Math.random(), name: '', price: '' };
     if (type === 'fromBelow') {
       setExpenseFromBelow([...expenseFromBelow, newItem]);
-      // You might need to use a setTimeout to ensure the DOM has updated
+      // Focus on the new price input after state update
       setTimeout(() => {
-        // Find the new price input and focus it
-        const inputs = document.querySelectorAll('[data-type="fromBelow"] input[type="text"]');
-        const lastInput = inputs[inputs.length - 2]; // The price input of the last row
-        if (lastInput) lastInput.focus();
-      }, 0);
+        const inputs = document.querySelectorAll('[data-type="fromBelow"] input');
+        // The price input is the first input in the last row
+        const priceInputs = Array.from(inputs).filter(input => input.placeholder === '0.00');
+        const lastPriceInput = priceInputs[priceInputs.length - 1];
+        if (lastPriceInput) lastPriceInput.focus();
+      }, 50);
     } else {
       setExpenseFromAbove([...expenseFromAbove, newItem]);
-      // Similar focus logic for fromAbove
-
+      // Focus on the new price input after state update
       setTimeout(() => {
-        // Find the new price input and focus it
-        const inputs = document.querySelectorAll('[data-type="fromBelow"] input[type="text"]');
-        const lastInput = inputs[inputs.length - 2]; // The price input of the last row
-        if (lastInput) lastInput.focus();
-      }, 0);
+        const inputs = document.querySelectorAll('[data-type="fromAbove"] input');
+        // The price input is the first input in the last row
+        const priceInputs = Array.from(inputs).filter(input => input.placeholder === '0.00');
+        const lastPriceInput = priceInputs[priceInputs.length - 1];
+        if (lastPriceInput) lastPriceInput.focus();
+      }, 50);
     }
   };
 
@@ -202,6 +203,14 @@ const ExpenseDetailView = () => {
       setExpenseFromAbove(
         expenseFromAbove.map(item => (item.id === id ? { ...item, [field]: value } : item))
       );
+    }
+  };
+
+  // Handle Enter key press to add new expense
+  const handleEnterKeyPress = (e, type) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddExpense(type);
     }
   };
 
@@ -430,12 +439,7 @@ const ExpenseDetailView = () => {
                           onChange={e =>
                             handleExpenseChange('fromBelow', item.id, 'name', e.target.value)
                           }
-                          onKeyDown={e => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault();
-                              handleAddExpense('fromBelow');
-                            }
-                          }}
+                          onKeyDown={e => handleEnterKeyPress(e, 'fromBelow')}
                           inputProps={{
                             style: { fontSize: isMobile ? 14 : 16 },
                           }}
@@ -556,12 +560,7 @@ const ExpenseDetailView = () => {
                           onChange={e =>
                             handleExpenseChange('fromAbove', item.id, 'name', e.target.value)
                           }
-                          onKeyDown={e => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault();
-                              handleAddExpense('fromAbove');
-                            }
-                          }}
+                          onKeyDown={e => handleEnterKeyPress(e, 'fromAbove')}
                           inputProps={{
                             style: { fontSize: isMobile ? 14 : 16 },
                           }}
